@@ -239,7 +239,10 @@ void pir_sensor_alarm() {
 }
 }
 
-void reboot() { // функция перезагрузки контроллера
+void reboot() {
+    /*
+    This function using for Arduino Uno programm reboot 
+    */
     send_system_message(REBOOT);
     delay(5000);
     digitalWrite(reset, LOW);
