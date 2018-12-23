@@ -204,23 +204,30 @@ void get_light_power() {
    Serial.print(analogRead(photores));
    send_system_message(OK);
 }
-void pir_sensor() {//функция управления ИК-датчиком
-    if (analogRead(photores) > 200) {
-        is_dark_room = true;
-        }
+void pir_sensor() {
+    /*
+    This function using for detect an intruder when no light in room
+    */
+   //This variable definite a level of illumination when exceeding it will be triggered alarm
+   unsigned int threshold = 200;
+   if (analogRead(photores) > threshold) {
+       is_dark_room = true;
+       }
     else {
         is_dark_room = false;
-    }
+        }
+
+    // Enabling alarm
     if ((is_dark_room == true) && (digitalRead(pir) == HIGH)) {
         pir_sensor_alarm();
-        Serial.println("Interloper!!!");
+        Serial.println("Intruder!!!");
     }
     else {
         return;
-        }
+    }
 }
 
-void pir_sensor_alarm() { //функция подачи тревоги
+void pir_sensor_alarm() {
     for (int i = 0; i < 10; i++) {
         digitalWrite(green, HIGH);
         delay(1000);
