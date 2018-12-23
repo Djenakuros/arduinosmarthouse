@@ -252,7 +252,7 @@ void reboot() {
 
 unsigned short int HWAddr(unsigned short int raw_data) {
     /* Function for get target device address
-    
+
     Arguments:
     * raw_data: data from serial port
     */
@@ -260,9 +260,13 @@ unsigned short int HWAddr(unsigned short int raw_data) {
     return merge;
 }
 
-byte HWData(byte data){
-    //получение данных
-    byte merge = data&wildcard;
+unsigned short int HWData(unsigned short int raw_data){
+     /* Function for get target device address
+
+    Arguments:
+    * raw_data: data from serial port
+    */
+    unsigned short int merge = raw_data & wildcard;
     return merge;
 }
 
