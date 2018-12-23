@@ -7,5 +7,3 @@ This subsystem included:
 * Managing lamp
 * Detecting intruders in dark room and send alarm
 * Bluetooth manager
-
-If you interesting this project and wand to build it, please, write an e-mail to nezamayw@gmail.com and I will send you scheme.
