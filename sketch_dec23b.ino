@@ -243,9 +243,11 @@ void reboot() {
     /*
     This function using for Arduino Uno programm reboot 
     */
-    send_system_message(REBOOT);
-    delay(5000);
-    digitalWrite(reset, LOW);
+   //Time in miliseconds to rebooting
+   unsigned int timeout = 5000;
+   send_system_message(REBOOT);
+   delay(timeout);
+   digitalWrite(reset, LOW);
 }
 
 
