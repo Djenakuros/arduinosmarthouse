@@ -195,9 +195,14 @@ void dht_data(unsigned short int data) {
         }
 }
 
-void get_light_power() { // функция получения уровня освещенности
-    Serial.print(analogRead(photores));
-    send_system_message(OK);
+void get_light_power() { 
+    /*
+    Function for getting data from photoresistor.
+
+    Function has no arguments
+    */
+   Serial.print(analogRead(photores));
+   send_system_message(OK);
 }
 void pir_sensor() {//функция управления ИК-датчиком
     if (analogRead(photores) > 200) {
