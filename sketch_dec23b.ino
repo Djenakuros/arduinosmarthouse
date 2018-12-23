@@ -1,49 +1,59 @@
 #include <DHT.h>
 
-//инициализация пинов
-const short int green = 6;
-const short int yellow = 10;
-const short int photores_power = 9;
+//initializing pins
+//it's not a green, but it happens historically:) If be seriously, it's for alarm lamp
+const short int green = 9;
+//for flashlight
+const short int yellow = 10; 
+//Arduino Uno need a more 5V DC Out
+const short int photores_power = 3; 
+//for getting data from photoresistor
 const short int photores = A0;
+//for programm reset
 const short int reset = 11;
+//for getting data from PIR sensor
 const short int pir = 4;
-const short int dht_port = 3;
+//for detting data from DHT11
+const short int dht_port = 3
 
+//initializing DHT
+DHT dht(dht_port, DHT11);
 
-DHT dht(dht_port, DHT11);//инициализация датчика
-//битовые маски
+//byte mask
+const short unsigned int mask = 192; //for address of device
+const short unsigned int wildcard = 63; //for command to device
 
-const unsigned int mask = 192;
-const unsigned int wildcard = 63;
+const short int baudrate = 9600;//port speed
 
-const short int baudrate = 9600;//скорость порта
-
-
-//вспомогательные переменные
-String in;
-unsigned int inc = 0u;
+//additional variables
+byte inc = 0;
 bool is_enabled_led = false;
 bool is_dark_room = false;
 
+//prototyping functions
 void yellow_led(byte data);
 void dht_data(byte data);
 
 //answer definition
-const unsigned int OK = 0x0000u;
-const unsigned int NO_COMMAND = 0x0001u;
-const unsigned int NO_DATA = 0x0002u;
-const unsigned int NO_DEVICE = 0x0003u;
-const unsigned int REBOOT = 0x0004u;
+const short unsigned int OK = 0x0000
+const short unsigned int NO_COMMAND = 0x0001
+const short unsigned int NO_DATA = 0x0002
+const short unsigned int NO_DEVICE = 0x0003
+const short unsigned int REBOOT = 0x00FF
 
 //device definition
-const unsigned int dev_photores = 0x0040u;
-const unsigned int dev_lamp = 0x0080u;
-const unsigned int dev_sensor_temp = 0x00C0u;
-const unsigned int dev_sensor_pir = 0x0000u;
-const unsigned int dev_root_reboot = 0x00FFu;
+const short unsigned int dev_photores = 0x0040
+const short unsigned int dev_lamp = 0x0080
+const short unsigned int dev_sensor_temp = 0x00C0
+const short unsigned int dev_sensor_pir = 0x0000
+const short unsigned int dev_root_reboot = 0x00FF
 
 void send_system_message(unsigned short int code) {
-    //функция вывода сообщений
+    /*This function interprete a return code to string message.
+    Arguments:
+
+    * code: code of message
+    */
     switch (code) {
     case OK: {
       Serial.println("OK");
@@ -71,70 +81,61 @@ void send_system_message(unsigned short int code) {
 }
 
 void push_data(unsigned short int addr, unsigned short int data) { 
-  /*
-  if (addr == dev_lamp) {
-  }
-  if (addr == dev_sensor_temp) {
-    dht_data(data);
-  }
-  if (addr == dev_photores) {
-    get_light_power();
-  }
-  if (addr == dev_root_reboot) {
-    reboot();
-  }
-  */
-
- //функция подачи команд на устройства
+ /*This function send data to particular device.
+  Arguments:
+    * addr: device address, definited in "device definition" block
+    * data: command to device
+ */
   switch(addr){
-      case dev_lamp:{
-      led(data);
-      }
-      break;
-      case dev_sensor_temp:{
-      dht_data(data);
-      }
-      break;
-      case dev_photores:{
-      get_light_power();
-      }
-      break;
-      case dev_root_reboot:{
-      reboot();
-      }
-      break;
-      default:{
-        send_system_message(NO_DEVICE);
-      }
-  }
-}
-
-
-
-
-void led(unsigned short int data) {//функция зажигания освещения
-    switch (data){
-     case 0x0001: {
-       is_enabled_led = false;
-       send_system_message(OK);
+    case dev_lamp:{
+        led(data);
     }
     break;
-      case 0x0003: {
-       is_enabled_led = true;
-       send_system_message(OK);
-       }
-       break;
-      default: {
-       send_system_message(NO_COMMAND);
-      }
-     break;
-  }
-  if (is_enabled_led) {
-    digitalWrite(yellow, HIGH);
-  }
-  else {
-    digitalWrite(yellow, LOW);
-  }
+    case dev_sensor_temp:{
+        dht_data(data);
+    }
+    break;
+    case dev_photores:{
+        get_light_power();
+    }
+    break;
+    case dev_root_reboot:{
+        reboot();
+    }
+    break;
+    default:{
+        send_system_message(NO_DEVICE);
+    }
+    }
+}
+
+void led(unsigned short int data) {
+    /*
+    This function manages a LED.
+
+    */
+   switch (data){
+       case 0x01: {
+           is_enabled_led = false;
+           send_system_message(OK);
+           }
+        break;
+        case 0x03: {
+            is_enabled_led = true;
+            send_system_message(OK);
+        }
+        break;
+        default: {
+            send_system_message(NO_COMMAND);
+        }
+        break;
+    }
+    if (is_enabled_led) {
+        digitalWrite(yellow, HIGH);
+        }
+    else {
+        digitalWrite(yellow, LOW);
+    }
 }
 
 
@@ -144,7 +145,7 @@ void dht_data(unsigned short int data) { //функция получения д�
   bool is_data = !(isnan(t) || isnan(h));
 
   switch (data) {
-    case 0x0001: {
+    case 0x01: {
       if (is_data) {
         send_system_message(OK);
         Serial.print("Humidity = ");
@@ -156,7 +157,7 @@ void dht_data(unsigned short int data) { //функция получения д�
          }
     }
     break;
-    case 0x0002: {
+    case 0x02: {
         if (is_data) {
             send_system_message(OK);
             Serial.print("Temperature: ");
@@ -168,7 +169,7 @@ void dht_data(unsigned short int data) { //функция получения д�
             }
     }
     break;
-    case 0x0003: {
+    case 0x03: {
         if (is_data) {
             send_system_message(OK);
             Serial.print("Humidity = ");
@@ -195,7 +196,7 @@ void get_light_power() { // функция получения уровня ос�
     send_system_message(OK);
 }
 void pir_sensor() {//функция управления ИК-датчиком
-    if (analogRead(photores) > 450) {
+    if (analogRead(photores) > 200) {
         is_dark_room = true;
         }
     else {
@@ -211,7 +212,7 @@ void pir_sensor() {//функция управления ИК-датчиком
 }
 
 void pir_sensor_alarm() { //функция подачи тревоги
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 10; i++) {
         digitalWrite(green, HIGH);
         delay(1000);
         digitalWrite(green, LOW);
@@ -227,32 +228,14 @@ void reboot() { // функция перезагрузки контроллер�
 
 
 void setup() {
-   while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
-  Serial.begin(baudrate);//открытие порта  
-  Serial.println("Arduino OS v0.2a");
-  Serial.println("System loading...");
-  delay(1000);
-  Serial.println("Reboot trigger enabling...");
-  digitalWrite(reset, HIGH);
-  Serial.println("Reboot trigger enable...");
-  
-  Serial.println("Pin setup...");
-  pinMode(green, OUTPUT);
-  pinMode(yellow, OUTPUT);
-  pinMode(reset, OUTPUT);
-  Serial.println("Pins enabled...");
-  
-  Serial.println("DHT configuring...");
-  dht.begin();//включить датчик
-  Serial.println("DHT Configured...");
-  
-  Serial.println("Photoresistor trigger configuring...");
-  digitalWrite(photores_power, HIGH);
-  Serial.println("Photoresistor trigger enabled...");
-
-  Serial.println("Welcome to Arduino OS! Please, enter command:");
+    Serial.begin(baudrate);//открытие порта  
+//инициализация портов
+    digitalWrite(reset, HIGH);
+    pinMode(green, OUTPUT);
+    pinMode(yellow, OUTPUT);
+    pinMode(reset, OUTPUT);
+    dht.begin();//включить датчик
+    digitalWrite(photores_power, HIGH);
     }
 
 unsigned short int HWAddr(unsigned short int data) {
@@ -261,38 +244,21 @@ unsigned short int HWAddr(unsigned short int data) {
     return merge;
 }
 
-unsigned short int HWData(unsigned short int data){
+byte HWData(byte data){
     //получение данных
-    unsigned short int merge = data & wildcard;
+    byte merge = data&wildcard;
     return merge;
 }
 
 //отправка данных на нужное устройство
-String input_string = "";
+
+
 void loop() {
-    if (Serial.available() > 0) {// получение данных с клиента
-      while (Serial.available() > 0) {
-        char c = Serial.read();
-        if (c == '\n') { 
-          inc = input_string.toInt();
-          Serial.print("Input_string is: ");
-          Serial.println(input_string);
-          Serial.print("Input_string integer is: ");
-          Serial.println(inc);
-          input_string = "";
-          push_data(HWAddr(inc), HWData(inc));
-          } 
-        else {
-          input_string += c;
+    if (Serial.available()) {// получение данных с клиента
+    inc = Serial.parseInt();
+    Serial.flush();
+    Serial.println(inc); //debug info
+    push_data(HWAddr(inc), HWData(inc));
     }
-  }
-    }
-    pir_sensor();
-    //inc = inString.toInt();
-    //Serial.println(inc); //debug info
-    //Serial.flush();
-    //if(inc !=0 ){
-    
-    //}
-     // контроль присутствия
+    pir_sensor(); // контроль присутствия
 }
