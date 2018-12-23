@@ -228,6 +228,9 @@ void pir_sensor() {
 }
 
 void pir_sensor_alarm() {
+    /*
+    This function using for alarm
+    */
     for (int i = 0; i < 10; i++) {
         digitalWrite(green, HIGH);
         delay(1000);
