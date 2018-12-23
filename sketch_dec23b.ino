@@ -111,8 +111,7 @@ void push_data(unsigned short int addr, unsigned short int data) {
 
 void led(unsigned short int data) {
     /*
-    This function manages a LED.
-
+    This function manages a LED
     */
    switch (data){
        case 0x01: {
@@ -138,57 +137,62 @@ void led(unsigned short int data) {
     }
 }
 
-
-void dht_data(unsigned short int data) { //функция получения данных с датчика
-  float h = dht.readHumidity();
-  float t = dht.readTemperature();
-  bool is_data = !(isnan(t) || isnan(h));
-
-  switch (data) {
-    case 0x01: {
-      if (is_data) {
-        send_system_message(OK);
-        Serial.print("Humidity = ");
-        Serial.print(h);
-        Serial.print(" %\t");
-       }
-       else {
-         send_system_message(NO_DATA);
-         }
-    }
-    break;
-    case 0x02: {
-        if (is_data) {
-            send_system_message(OK);
-            Serial.print("Temperature: ");
-            Serial.print(t);
-            Serial.println(" *C");
+void dht_data(unsigned short int data) {
+    /*
+    This function get data on demand from DHT.
+    Arguments:
+    * data: command to DHT
+    */
+   //checking availability of DHT
+   float h = dht.readHumidity();
+   float t = dht.readTemperature();
+   bool is_data = !(isnan(t) || isnan(h));
+   
+   switch (data) {
+       case 0x01: {
+           if (is_data) {
+               send_system_message(OK);
+               Serial.print("Humidity = ");
+               Serial.print(h);
+               Serial.print(" %\t");
+               }
+               else {
+                   send_system_message(NO_DATA);
+                }
             }
-        else {
-            send_system_message(NO_DATA);
+        break;
+        case 0x02: {
+            if (is_data) {
+                send_system_message(OK);
+                Serial.print("Temperature: ");
+                Serial.print(t);
+                Serial.println(" *C");
             }
-    }
-    break;
-    case 0x03: {
-        if (is_data) {
-            send_system_message(OK);
-            Serial.print("Humidity = ");
-            Serial.print(h);
-            Serial.print(" %\t");
-            Serial.print("Temperature: ");
-            Serial.print(t);
-            Serial.println(" *C");
+            else {
+                send_system_message(NO_DATA);
+            }
         }
-        else {
-            send_system_message(NO_DATA);
+        break;
+        case 0x03: {
+            if (is_data) {
+                send_system_message(OK);
+                Serial.print("Humidity = ");
+                Serial.print(h);
+                Serial.print(" %\t");
+                Serial.print("Temperature: ");
+                Serial.print(t);
+                Serial.println(" *C");
+                }
+            else {
+                send_system_message(NO_DATA);
+            }
         }
-    }
-    break;
-    default:{
-        send_system_message(NO_COMMAND);
+        break;
+        default:{
+            send_system_message(NO_COMMAND);
         }
-    break;
-    }
+        break;
+        }
 }
 
 void get_light_power() { // функция получения уровня освещенности
