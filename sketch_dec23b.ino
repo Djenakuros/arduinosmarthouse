@@ -271,18 +271,22 @@ unsigned short int HWData(unsigned short int raw_data){
 }
 
 void setup() {
-    Serial.begin(baudrate);  
-    digitalWrite(reset, HIGH);
-    pinMode(green, OUTPUT);
-    pinMode(yellow, OUTPUT);
-    pinMode(reset, OUTPUT);
-    dht.begin();//включить датчик
-    digitalWrite(photores_power, HIGH);
-    }
-
-
-
-//отправка данных на нужное устройство
+    /*
+    Default function of Arduino
+    */
+   // Open Serial
+   Serial.begin(baudrate);
+   //Set High level on Reset port
+   digitalWrite(reset, HIGH);
+   //Activating send data mode on pins
+   pinMode(green, OUTPUT);
+   pinMode(yellow, OUTPUT);
+   pinMode(reset, OUTPUT);
+   //Enable DHT
+   dht.begin();
+   //Power on photoresistor
+   digitalWrite(photores_power, HIGH);
+}
 
 
 void loop() {
