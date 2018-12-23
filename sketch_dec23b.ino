@@ -250,21 +250,13 @@ void reboot() {
    digitalWrite(reset, LOW);
 }
 
-
-void setup() {
-    Serial.begin(baudrate);//открытие порта  
-//инициализация портов
-    digitalWrite(reset, HIGH);
-    pinMode(green, OUTPUT);
-    pinMode(yellow, OUTPUT);
-    pinMode(reset, OUTPUT);
-    dht.begin();//включить датчик
-    digitalWrite(photores_power, HIGH);
-    }
-
-unsigned short int HWAddr(unsigned short int data) {
-    //получение адреса устройства
-    unsigned short int merge = data & mask;
+unsigned short int HWAddr(unsigned short int raw_data) {
+    /* Function for get target device address
+    
+    Arguments:
+    * raw_data: data from serial port
+    */
+    unsigned short int merge = raw_data & mask;
     return merge;
 }
 
@@ -273,6 +265,18 @@ byte HWData(byte data){
     byte merge = data&wildcard;
     return merge;
 }
+
+void setup() {
+    Serial.begin(baudrate);  
+    digitalWrite(reset, HIGH);
+    pinMode(green, OUTPUT);
+    pinMode(yellow, OUTPUT);
+    pinMode(reset, OUTPUT);
+    dht.begin();//включить датчик
+    digitalWrite(photores_power, HIGH);
+    }
+
+
 
 //отправка данных на нужное устройство
 
